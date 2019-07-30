@@ -72,14 +72,14 @@ int buttonState7 = 0;
 #define DATA_PIN3 6
 #define NUM_LEDS3    7
 CRGB strip3[NUM_LEDS3];
-int potPin1 = A4;
-int val1 = 0;
+int potPin1 = A0;
+int valOne = 0;
 
 /*======================= light Potentiometer Pink Declorations =======================*/
 #define DATA_PIN4 9
 #define NUM_LEDS4    7
 CRGB strip4[NUM_LEDS4];
-int potPin2 = A5;
+int potPin2 = A1;
 int val2 = 0;
 
 void setup() {
@@ -171,18 +171,15 @@ void loop() {
     Serial.println("yellow");
   }
 
-  int val1 = analogRead(potPin1);
   ledClimb();
-
-  int val2 = analogRead(potPin2);
   ledClimb2();
 
 }
 
 /*======================= ledsClimb Blue =======================*/
 void ledClimb() {
-  //int val = analogRead(potPin);
-  int numLedsToLight = map(val1, 0, 1023, 0, NUM_LEDS3);
+  int valOne = analogRead(potPin1);
+  int numLedsToLight = map(valOne, 0, 1023, 0, NUM_LEDS3);
 
   // First, clear the existing led values
   FastLED.clear();
@@ -194,7 +191,7 @@ void ledClimb() {
 
 /*======================= ledsClimb2 Pink =======================*/
 void ledClimb2() {
-  //int val2 = analogRead(potPin2);
+  int val2 = analogRead(potPin2);
   int numLedsToLight = map(val2, 0, 1023, 0, NUM_LEDS4);
 
   // First, clear the existing led values
@@ -204,6 +201,7 @@ void ledClimb2() {
   }
   FastLED.show();
 }
+
 /*======================= noiseFunction Function =======================*/
 void fillnoise8() {
   for (int i = 0; i < MAX_DIMENSION; i++) {
