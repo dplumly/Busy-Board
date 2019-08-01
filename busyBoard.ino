@@ -4,7 +4,7 @@
 
 /*======================= colorPallete Declorations =======================*/
 #define DATA_PIN1    3
-#define NUM_LEDS1    7
+#define NUM_LEDS1    8
 #define BRIGHTNESS  64
 #define COLOR_ORDER GRB
 CRGB strip1[NUM_LEDS1];
@@ -68,16 +68,25 @@ int buttonState6 = 0;
 const int buttonPin7 = 12;
 int buttonState7 = 0;
 
+int led3 = 22;
+int led4 = 24;
+int led5 = 26;
+int led6 = 28;
+int led7 = 30;
+
+const int delayTime = 1000;
+
+
 /*======================= light Potentiometer Blue Declorations =======================*/
 #define DATA_PIN3 6
-#define NUM_LEDS3    7
+#define NUM_LEDS3    8
 CRGB strip3[NUM_LEDS3];
 int potPin1 = A0;
 int valOne = 0;
 
 /*======================= light Potentiometer Pink Declorations =======================*/
 #define DATA_PIN4 9
-#define NUM_LEDS4    7
+#define NUM_LEDS4    8
 CRGB strip4[NUM_LEDS4];
 int potPin2 = A1;
 int val2 = 0;
@@ -86,7 +95,7 @@ void setup() {
   Serial.begin(9600);
   delay( 3000 ); // power-up safety delay
   FastLED.setBrightness(  BRIGHTNESS );
-
+  FastLED.clear();
 
   /*======================= colorPallette Declorations =======================*/
   FastLED.addLeds<NEOPIXEL, DATA_PIN1>(strip1, NUM_LEDS1).setCorrection( TypicalLEDStrip );
@@ -115,6 +124,12 @@ void setup() {
   pinMode(buttonPin6, INPUT_PULLUP);  // green
   pinMode(buttonPin7, INPUT_PULLUP);  // yellow
 
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+  pinMode(led5, OUTPUT);
+  pinMode(led6, OUTPUT);
+  pinMode(led7, OUTPUT);  
+
   /*======================= pot Setup =======================*/
   pinMode(potPin1, INPUT);
   pinMode(potPin2, INPUT);
@@ -126,54 +141,76 @@ void loop() {
   buttonState1 = digitalRead(buttonPin1);
   if (buttonState1 == LOW) {
     colorPalette();
-    Serial.println("colorPallette");
   }
 
   // read noiseFunction pin
   buttonState2 = digitalRead(buttonPin2);
   if (buttonState2 == LOW) {
     noiseFunction();
-    Serial.println("noiseFunction");
   }
 
-  // read clear pin
+   // read arcade clear pin
   buttonState3 = digitalRead(buttonPin3);
   if (buttonState3 == LOW) {
-    digitalWrite(buttonPin3, HIGH);
+    digitalWrite(led3, HIGH);
+    delay(delayTime);
+    digitalWrite(led3, LOW);
     Serial.println("clear");
   }
 
-  // read red pin
+  // read arcade red pin
   buttonState4 = digitalRead(buttonPin4);
   if (buttonState4 == LOW) {
-    digitalWrite(buttonPin4, HIGH);
+    digitalWrite(led4, HIGH);
+    digitalWrite(led4, HIGH);
+    delay(delayTime);
+    digitalWrite(led4, LOW);
     Serial.println("red");
   }
 
-  // read blue pin
+  // read arcade blue pin
   buttonState5 = digitalRead(buttonPin5);
   if (buttonState5 == LOW) {
-    digitalWrite(buttonPin5, HIGH);
+    digitalWrite(led5, HIGH);
+    digitalWrite(led5, HIGH);
+    delay(delayTime);
+    digitalWrite(led5, LOW);
     Serial.println("blue");
   }
 
-  // read green pin
+  // read arcade green pin
   buttonState6 = digitalRead(buttonPin6);
   if (buttonState6 == LOW) {
-    digitalWrite(buttonPin6, HIGH);
+    digitalWrite(led6, HIGH);
+    digitalWrite(led6, HIGH);
+    delay(delayTime);
+    digitalWrite(led6, LOW);
     Serial.println("green");
   }
 
-  // read yellow pin
+  // read arcade yellow pin
   buttonState7 = digitalRead(buttonPin7);
   if (buttonState7 == LOW) {
-    digitalWrite(buttonPin7, HIGH);
+    digitalWrite(led7, HIGH);
+    digitalWrite(led7, HIGH);
+    delay(delayTime);
+    digitalWrite(led7, LOW);
     Serial.println("yellow");
   }
+ 
+    // read potPin1 pin
+    int potTrigger1 = analogRead(potPin1);
+    if (potTrigger1 > 50) {
+      //Serial.println(potTrigger1);
+      ledClimb();
+    }
 
-  ledClimb();
-  ledClimb2();
-
+    // read potPin1 pin
+    int potTrigger2 = analogRead(potPin2);
+    if (potTrigger2 > 50) {
+      //Serial.println(potTrigger2);
+      ledClimb2();
+    }
 }
 
 /*======================= ledsClimb Blue =======================*/
@@ -200,30 +237,6 @@ void ledClimb2() {
     strip4[led] = CRGB::Green;
   }
   FastLED.show();
-}
-
-/*======================= noiseFunction Function =======================*/
-void fillnoise8() {
-  for (int i = 0; i < MAX_DIMENSION; i++) {
-    int ioffset = scale * i;
-    for (int j = 0; j < MAX_DIMENSION; j++) {
-      int joffset = scale * j;
-      noise[i][j] = inoise8(x + ioffset, y + joffset, z);
-    }
-  }
-  z += speed;
-}
-
-void noiseFunction() {
-  static uint8_t ihue = 0;
-  fillnoise8();
-  for (int i = 0; i < kMatrixWidth; i++) {
-    for (int j = 0; j < kMatrixHeight; j++) {
-      strip2[XY(i, j)] = CHSV(noise[j][i], 255, noise[i][j]);
-    }
-  }
-  ihue += 1;
-  LEDS.show();
 }
 
 /*======================= colorPalette Function =======================*/
@@ -357,3 +370,27 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
   CRGB::Black,
   CRGB::Black
 };
+
+/*======================= noiseFunction Function =======================*/
+void fillnoise8() {
+  for (int i = 0; i < MAX_DIMENSION; i++) {
+    int ioffset = scale * i;
+    for (int j = 0; j < MAX_DIMENSION; j++) {
+      int joffset = scale * j;
+      noise[i][j] = inoise8(x + ioffset, y + joffset, z);
+    }
+  }
+  z += speed;
+}
+
+void noiseFunction() {
+  static uint8_t ihue = 0;
+  fillnoise8();
+  for (int i = 0; i < kMatrixWidth; i++) {
+    for (int j = 0; j < kMatrixHeight; j++) {
+      strip2[XY(i, j)] = CHSV(noise[j][i], 255, noise[i][j]);
+    }
+  }
+  ihue += 1;
+  LEDS.show();
+}
